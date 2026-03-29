@@ -83,3 +83,20 @@ contract CobaltMicaGlyph {
         unchecked {
             n = ++pulseNonce;
         }
+
+        (bool ok, ) = payable(sink).call{value: amount}("");
+        if (!ok) revert CobaltMicaGlyph_TransferFailed();
+
+        emit CobaltMicaGlyph_Pulse(n, amount, sink);
+    }
+
+    function wardSweepConduit(uint256 amount) external onlyWard nonReentrant {
+        if (amount == 0) revert CobaltMicaGlyph_AmountZero();
+        uint256 bal = address(this).balance;
+        if (amount > bal) revert CobaltMicaGlyph_AmountZero();
+
+        (bool ok, ) = payable(conduit).call{value: amount}("");
+        if (!ok) revert CobaltMicaGlyph_TransferFailed();
+
+        emit CobaltMicaGlyph_ConduitSweep(amount, conduit);
+    }
