@@ -66,3 +66,20 @@ contract CobaltMicaGlyph {
 
     function isMatrixSink(address a) external pure returns (bool) {
         return _matrixMember(a);
+    }
+
+    function wardPulse(address sink, uint256 amount) external onlyWard nonReentrant {
+        if (amount == 0) revert CobaltMicaGlyph_AmountZero();
+        if (amount > DRIP_CAP) revert CobaltMicaGlyph_CapBreached(DRIP_CAP);
+        if (!_matrixMember(sink)) revert CobaltMicaGlyph_RecipientNotOnMatrix(sink);
+        if (block.timestamp < lastPulseAt + PULSE_COOLDOWN) {
+            revert CobaltMicaGlyph_CooldownActive(lastPulseAt + PULSE_COOLDOWN);
+        }
+        uint256 bal = address(this).balance;
+        if (amount > bal) revert CobaltMicaGlyph_AmountZero();
+
+        lastPulseAt = block.timestamp;
+        uint256 n;
+        unchecked {
+            n = ++pulseNonce;
+        }
