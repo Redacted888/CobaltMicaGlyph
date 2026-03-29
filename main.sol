@@ -100,3 +100,17 @@ contract CobaltMicaGlyph {
 
         emit CobaltMicaGlyph_ConduitSweep(amount, conduit);
     }
+
+    function traceSlate(bytes32 a, bytes32 b) external onlyWard {
+        emit CobaltMicaGlyph_SlateTraced(a, b, msg.sender);
+    }
+
+    function glyphFingerprint() external view returns (bytes32) {
+        return keccak256(abi.encodePacked(ward, conduit, genesisEpoch, address(this)));
+    }
+
+    function residueQuotient() external view returns (uint256) {
+        if (block.timestamp <= genesisEpoch) return 0;
+        return (block.timestamp - genesisEpoch) >> 4;
+    }
+}
