@@ -49,3 +49,20 @@ contract CobaltMicaGlyph {
         ward = ward_;
         conduit = conduit_;
         genesisEpoch = block.timestamp;
+    }
+
+    receive() external payable {
+        emit CobaltMicaGlyph_Deposit(msg.sender, msg.value, bytes32(0));
+    }
+
+    function depositWithMemo(bytes32 memo) external payable {
+        if (msg.value == 0) revert CobaltMicaGlyph_AmountZero();
+        emit CobaltMicaGlyph_Deposit(msg.sender, msg.value, memo);
+    }
+
+    function _matrixMember(address a) internal pure returns (bool) {
+        return a == TRIPLEX_ALPHA || a == TRIPLEX_BETA || a == TRIPLEX_GAMMA;
+    }
+
+    function isMatrixSink(address a) external pure returns (bool) {
+        return _matrixMember(a);
