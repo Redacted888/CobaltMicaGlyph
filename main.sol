@@ -32,3 +32,20 @@ contract CobaltMicaGlyph {
 
     bool private _entrancyLocked;
 
+    modifier onlyWard() {
+        if (msg.sender != ward) revert CobaltMicaGlyph_AccessDenied();
+        _;
+    }
+
+    modifier nonReentrant() {
+        if (_entrancyLocked) revert CobaltMicaGlyph_AccessDenied();
+        _entrancyLocked = true;
+        _;
+        _entrancyLocked = false;
+    }
+
+    constructor(address ward_, address conduit_) {
+        if (ward_ == address(0) || conduit_ == address(0)) revert CobaltMicaGlyph_AccessDenied();
+        ward = ward_;
+        conduit = conduit_;
+        genesisEpoch = block.timestamp;
